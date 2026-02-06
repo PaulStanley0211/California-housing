@@ -1,3 +1,334 @@
-<h1>
-Welcome to my Machine Learning Projects Repository
-</h1>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>California Housing Price Prediction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #999;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f0f7ff;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result-label {
+            color: #666;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .result-value {
+            color: #667eea;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .error {
+            color: #e74c3c;
+            background: #fadbd8;
+            padding: 12px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🏠 House Price Prediction</h1>
+        <p class="subtitle">California Housing Dataset</p>
+
+        <form id="predictionForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="medinc">Median Income</label>
+                    <input type="number" id="medinc" name="medinc" step="0.01" required placeholder="e.g., 8.32">
+                    <div class="help-text">Median household income in units of $100,000</div>
+                </div>
+                <div class="form-group">
+                    <label for="houseage">House Age</label>
+                    <input type="number" id="houseage" name="houseage" step="0.1" required placeholder="e.g., 41">
+                    <div class="help-text">Age of house in years</div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="averooms">Average Rooms</label>
+                    <input type="number" id="averooms" name="averooms" step="0.01" required placeholder="e.g., 6.98">
+                    <div class="help-text">Average rooms per household</div>
+                </div>
+                <div class="form-group">
+                    <label for="avebedrms">Average Bedrooms</label>
+                    <input type="number" id="avebedrms" name="avebedrms" step="0.01" required placeholder="e.g., 1.02">
+                    <div class="help-text">Average bedrooms per household</div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="population">Population</label>
+                    <input type="number" id="population" name="population" step="1" required placeholder="e.g., 322">
+                    <div class="help-text">Block group population</div>
+                </div>
+                <div class="form-group">
+                    <label for="aveoccup">Average Occupancy</label>
+                    <input type="number" id="aveoccup" name="aveoccup" step="0.01" required placeholder="e.g., 2.55">
+                    <div class="help-text">Average occupancy per household</div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="latitude">Latitude</label>
+                    <input type="number" id="latitude" name="latitude" step="0.01" required placeholder="e.g., 37.88">
+                    <div class="help-text">Geographic latitude</div>
+                </div>
+                <div class="form-group">
+                    <label for="longitude">Longitude</label>
+                    <input type="number" id="longitude" name="longitude" step="0.01" required placeholder="e.g., -122.23">
+                    <div class="help-text">Geographic longitude</div>
+                </div>
+            </div>
+
+            <button type="submit" id="predictBtn">Predict Price</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px; color: #667eea;">Analyzing data...</p>
+        </div>
+
+        <div class="result" id="result">
+            <div class="result-label">Predicted House Price</div>
+            <div class="result-value" id="resultValue">$0.00</div>
+        </div>
+
+        <div class="error" id="errorMsg"></div>
+
+        {% if prediction_text %}
+        <div class="result show">
+            <div class="result-label">Prediction Result</div>
+            <div class="result-value">{{ prediction_text }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        const form = document.getElementById('predictionForm');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+        const resultValue = document.getElementById('resultValue');
+        const errorMsg = document.getElementById('errorMsg');
+        const predictBtn = document.getElementById('predictBtn');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Clear previous results and errors
+            errorMsg.classList.remove('show');
+            result.classList.remove('show');
+            loading.style.display = 'block';
+            predictBtn.disabled = true;
+
+            try {
+                // Collect form data
+                const formData = new FormData(form);
+                const data = {
+                    medinc: parseFloat(formData.get('medinc')),
+                    houseage: parseFloat(formData.get('houseage')),
+                    averooms: parseFloat(formData.get('averooms')),
+                    avebedrms: parseFloat(formData.get('avebedrms')),
+                    population: parseFloat(formData.get('population')),
+                    aveoccup: parseFloat(formData.get('aveoccup')),
+                    latitude: parseFloat(formData.get('latitude')),
+                    longitude: parseFloat(formData.get('longitude'))
+                };
+
+                // Make prediction API call
+                const response = await fetch('/predict_api', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ data: data })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Prediction failed. Please check your inputs.');
+                }
+
+                const prediction = await response.json();
+
+                // Display result
+                const price = (prediction * 100000).toFixed(2); // Convert to actual price
+                resultValue.textContent = '$' + parseFloat(price).toLocaleString('en-US', { 
+                    minimumFractionDigits: 2, 
+                    maximumFractionDigits: 2 
+                });
+                result.classList.add('show');
+
+            } catch (error) {
+                errorMsg.textContent = '❌ Error: ' + error.message;
+                errorMsg.classList.add('show');
+            } finally {
+                loading.style.display = 'none';
+                predictBtn.disabled = false;
+            }
+        });
+
+        // Validate inputs on change
+        const inputs = document.querySelectorAll('input[type="number"]');
+        inputs.forEach(input => {
+            input.addEventListener('change', function() {
+                if (this.value && parseFloat(this.value) < 0) {
+                    this.value = '';
+                    errorMsg.textContent = '⚠️ Please enter positive values only';
+                    errorMsg.classList.add('show');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
